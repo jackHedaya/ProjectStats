@@ -14,12 +14,11 @@ const fs = require ('fs');
             mean: undefined,
             median: undefined,
             range: undefined
-        }
+        };
 
         stats.mean = calcMean(lines);
-        console.log (getHigh(lines.map (x => x.length)))
-        stats.range = getHigh(lines.map (x => x.length)) - getLow(lines.map(x => x.length))
-
+        stats.range = getHigh(lines.map (x => x.length)) - getLow(lines.map(x => x.length));
+        stats.median = calcMedian (lines.map (x => x.length));
         console.log(stats);
         
     } else {
@@ -59,4 +58,13 @@ const fs = require ('fs');
     }
 
     return l;
+  }
+
+  function calcMedian (arr) {
+    const sorted = arr.sort(((x, y) => x - y));
+    console.log (sorted);
+    if (sorted.length % 2 === 0) return sorted[sorted.length / 2];
+
+    return calcMean(sorted[(sorted.length + 1) / 2], sorted.length / 2)
+
   }
