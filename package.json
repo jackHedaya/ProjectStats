@@ -1,0 +1,29 @@
+{
+  "name": "projectstats",
+  "version": "1.0.0",
+  "description": "A command line tool to give you useless information about your programming project such as mean characters per line etc.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackHedaya/ProjectStats.git"
+  },
+  "keywords": [
+    "stats",
+    "useless",
+    "command",
+    "line",
+    "tool"
+  ],
+  "author": "Jack Hedaya <jackehedaya@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jackHedaya/ProjectStats/issues"
+  },
+  "homepage": "https://github.com/jackHedaya/ProjectStats#readme",
+  "dependencies": {
+    "commander": "^2.15.1"
+  }
+}
