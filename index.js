@@ -5,20 +5,27 @@ const fs = require ('fs');
 
  program
   .arguments('<file>')
+  .option('-R --recursive', 'recursively generate stats for all of the files in a directory', false)
   .action(function(file) {
     if (fs.existsSync(file)) {
         const contents = fs.readFileSync(file).toString();
         const lines = contents.split('\n');
+        const lineCounts = lines.map(x => x.length).sort((x, y) => x - y);
 
         var stats = {
             mean: undefined,
             median: undefined,
-            range: undefined
+            range: undefined,
+            variance: undefined,
+            standardDeviation: undefined
         };
 
-        stats.mean = calcMean(lines);
-        stats.range = getHigh(lines.map (x => x.length)) - getLow(lines.map(x => x.length));
-        stats.median = calcMedian (lines.map (x => x.length));
+        stats.mean = calcMean(lineCounts);
+        stats.range = getHigh(lineCounts) - getLow(lineCounts);
+        stats.median = calcMedian (lineCounts);
+
+        stats.variance = calcVariance(lineCounts);
+        stats.standardDeviation = Math.sqrt(stats.variance);
         console.log(stats);
         
     } else {
@@ -34,7 +41,7 @@ const fs = require ('fs');
     let x = 0;
 
     for (var i of arr) {
-        x += i.length;
+        x += i;
     }
 
     return x / arr.length;
@@ -61,10 +68,21 @@ const fs = require ('fs');
   }
 
   function calcMedian (arr) {
-    const sorted = arr.sort(((x, y) => x - y));
-    console.log (sorted);
-    if (sorted.length % 2 === 0) return sorted[sorted.length / 2];
+    if (arr.length % 2 === 0) return arr[arr.length / 2];
 
-    return calcMean(sorted[(sorted.length + 1) / 2], sorted.length / 2)
-
+    return calcMean([arr[(arr.length + 1) / 2], arr.length / 2])
   }
+
+  function calcVariance(arr) {
+    if (arr.length < 2) return 0;
+    console.log (arr);
+    var total = 0;
+    const average = calcMean(arr);
+
+    console.log (arr);
+    for (var a of arr) {
+        total += Math.pow(a - average, 2);
+    }
+    
+    return total / arr.length - 1;
+  } 
