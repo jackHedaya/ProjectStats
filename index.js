@@ -1,43 +1,70 @@
 #!/usr/bin/env node
 
 var program = require('commander');
-const fs = require ('fs');
+const fs = require('fs');
 
- program
-  .arguments('<file>')
-  .option('-R --recursive', 'recursively generate stats for all of the files in a directory', false)
-  .action(function(file) {
-    if (fs.existsSync(file)) {
-        const contents = fs.readFileSync(file).toString();
-        const lines = contents.split('\n');
-        const lineCounts = lines.map(x => x.length).sort((x, y) => x - y);
-
-        var stats = {
-            mean: undefined,
-            median: undefined,
-            range: undefined,
-            variance: undefined,
-            standardDeviation: undefined
-        };
-
-        stats.mean = calcMean(lineCounts);
-        stats.range = getHigh(lineCounts) - getLow(lineCounts);
-        stats.median = calcMedian (lineCounts);
-
-        stats.variance = calcVariance(lineCounts);
-        stats.standardDeviation = Math.sqrt(stats.variance);
-        console.log(stats);
+program
+    .arguments('<file/directory>')
+    .option('-R --recursive <recursive>', 'recursively generate stats for all of the files in a directory', false)
+    .action(function (file) {
+        if (program.recursive && fs.lstatSync(file).isFile()) { console.log (file + ' is a file. Recursive argument ignored.\n') }
         
+        var stats = {};
+
+        var values = [];
+
+        if (fs.lstatSync(file).isDirectory()) {
+            for (var i of fs.readdirSync(file)) {
+                const path = file + i;
+
+                if (!fs.lstatSync(path).isFile()) continue;
+                
+                for (var x of getDocumentLines(path)) {
+                    values.push(x);
+                }
+            }
+        }
+        
+        values.sort((x, y) => x - y);
+
+        stats = calcStats (values);
+
+        fs.writeFileSync('lines.txt', values);
+        console.log (stats);
+        
+    })
+    .parse(process.argv);
+
+
+function calcStats(arr) {
+
+    var stats = {
+        mean: 0,
+        median: 0,
+        range: 0,
+        variance: 0,
+        standardDeviation: 0
+    };
+
+    stats.mean = calcMean(arr);
+    stats.range = getHigh(arr) - getLow(arr);
+    stats.median = calcMedian(arr);
+
+    stats.variance = calcVariance(arr);
+    stats.standardDeviation = Math.sqrt(stats.variance);
+
+    return stats;
+}
+
+function getDocumentLines (path) {
+    if (fs.existsSync (path)) {
+        return fs.readFileSync (path).toString().split('\n').map(x => x.length);
     } else {
-        console.error('Failed: ' + file + ' is not a file.');
-        process.exit();
+        throw 'Failed: ' + path + ' is not a file.';
     }
-        
-    
-  })
-  .parse(process.argv);
+}
 
-  function calcMean(arr) {
+function calcMean(arr) {
     let x = 0;
 
     for (var i of arr) {
@@ -45,9 +72,9 @@ const fs = require ('fs');
     }
 
     return x / arr.length;
-  }
+}
 
-  function getHigh(arr) {
+function getHigh(arr) {
     var h = 0;
 
     for (var i of arr) {
@@ -55,9 +82,9 @@ const fs = require ('fs');
     }
 
     return h;
-  }
+}
 
-  function getLow(arr) {
+function getLow(arr) {
     var l = 0;
 
     for (var i of arr) {
@@ -65,24 +92,30 @@ const fs = require ('fs');
     }
 
     return l;
-  }
+}
 
-  function calcMedian (arr) {
-    if (arr.length % 2 === 0) return arr[arr.length / 2];
+function calcMedian(arr) {
+    if (arr.length % 2 !== 0)
+        return arr[parseInt(arr.length / 2)];
 
-    return calcMean([arr[(arr.length + 1) / 2], arr.length / 2])
-  }
+    return calcMean([arr[parseInt(arr.length  / 2 - 1)], arr[parseInt(arr.length / 2)]]);
+}
 
-  function calcVariance(arr) {
+function calcVariance(arr) {
     if (arr.length < 2) return 0;
-    console.log (arr);
+
     var total = 0;
     const average = calcMean(arr);
 
-    console.log (arr);
     for (var a of arr) {
         total += Math.pow(a - average, 2);
     }
-    
+
     return total / arr.length - 1;
-  } 
+}
+
+function addObjects (obj1, obj2) {
+    for (var i in obj1) {
+        obj1[i] += obj2[i];
+    }
+}
