@@ -39,12 +39,10 @@ program
             }
         }
         
-        
         values.sort((x, y) => x - y);
 
         stats = calcStats (values);
 
-        fs.writeFileSync('lines.txt', values);
         console.log (stats);
         
     })
