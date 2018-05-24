@@ -7,23 +7,38 @@ program
     .arguments('<file/directory>')
     .option('-R --recursive <recursive>', 'recursively generate stats for all of the files in a directory', false)
     .action(function (file) {
-        if (program.recursive && fs.lstatSync(file).isFile()) { console.log (file + ' is a file. Recursive argument ignored.\n') }
+        if (program.recursive && fs.lstatSync(file).isFile()) { console.log (file + ' is a file. Recursive argument ignored.\n'); program.recursive = false; }
         
         var stats = {};
 
         var values = [];
 
-        if (fs.lstatSync(file).isDirectory()) {
-            for (var i of fs.readdirSync(file)) {
-                const path = file + i;
-
-                if (!fs.lstatSync(path).isFile()) continue;
-                
-                for (var x of getDocumentLines(path)) {
+        if (!program.recursive) {
+            if (fs.lstatSync(file).isDirectory()) {
+                for (var i of fs.readdirSync(file)) {
+                    const path = file + '/' + i;
+    
+                    if (!fs.lstatSync(path).isFile()) continue;
+                    
+                    for (var x of getDocumentLines(path)) {
+                        values.push(x);
+                    }
+                }
+            } else {
+                for (var x of getDocumentLines(file)) {
                     values.push(x);
                 }
             }
+        } else {
+            for (var dir of fs.readdirSync(file)) {
+                if (fs.lstatSync(file + '/' + dir).isDirectory()) {
+                    values = values.concat(getDirectoryLines (file + '/' + dir));
+                } else {
+                    values = values.concat(getDocumentLines (file + '/' + dir));
+                }
+            }
         }
+        
         
         values.sort((x, y) => x - y);
 
@@ -54,6 +69,22 @@ function calcStats(arr) {
     stats.standardDeviation = Math.sqrt(stats.variance);
 
     return stats;
+}
+
+function getDirectoryLines (path) {
+    var fPath = path;
+    var lines = [];
+
+    for (var dir of fs.readdirSync(fPath)) {
+        if (fs.lstatSync(fPath + '/' + dir).isDirectory()) {
+
+            lines = lines.concat(getDirectoryLines (fPath + '/' + dir));
+        } else {
+            lines = lines.concat(getDocumentLines (fPath + '/' + dir));
+        }
+    }
+
+    return lines;
 }
 
 function getDocumentLines (path) {
