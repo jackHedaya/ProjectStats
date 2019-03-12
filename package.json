@@ -1,10 +1,13 @@
 {
   "name": "projectstats",
-  "version": "1.0.1b",
+  "version": "1.0.2",
   "description": "A command line tool to give you useless information about your programming project such as mean characters per line etc.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "project-stats": "./cli.js"
   },
   "repository": {
     "type": "git",
