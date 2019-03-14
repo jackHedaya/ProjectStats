@@ -5,10 +5,10 @@ const fs = require('fs');
 
 program
     .arguments('<file/directory>')
-    .option('-R --recursive <recursive>', 'recursively generate stats for all of the files in a directory', false)
+    .option('-R, --recursive', 'recursively generate stats for all of the files in a directory', false)
     .action(function (file) {
         if (program.recursive && fs.lstatSync(file).isFile()) { console.log (file + ' is a file. Recursive argument ignored.\n'); program.recursive = false; }
-        
+
         var stats = {};
 
         var values = [];
