@@ -27,6 +27,6 @@
   },
   "homepage": "https://github.com/jackHedaya/ProjectStats#readme",
   "dependencies": {
-    "commander": "^2.15.1"
+    "commander": "^3.0.2"
   }
 }
