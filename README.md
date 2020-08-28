@@ -9,5 +9,5 @@ Project Stats is meant to give you all the useless statistics on how many lines 
   yarn: `$ yarn global add projectstats`
   
 ## Usage
-+ Recursive: `$ project-stats <file/dir>`
-+ Non-recursive: `$ project-stats -R <file/dir>` or `$ project-stats --recursive <file/dir>`
++ Shallow: `$ project-stats <file/dir>`
++ Recursive: `$ project-stats -R <file/dir>` or `$ project-stats --recursive <file/dir>`
