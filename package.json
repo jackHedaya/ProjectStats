@@ -1,6 +1,6 @@
 {
   "name": "projectstats",
-  "version": "1.0.2c",
+  "version": "1.0.3",
   "description": "A command line tool to give you useless information about your programming project such as mean characters per line etc.",
   "main": "index.js",
   "scripts": {
